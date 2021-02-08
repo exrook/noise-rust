@@ -9,6 +9,7 @@ use core::fmt::{Display, Error as FmtError, Formatter, Write};
 use alloc::vec::Vec;
 
 /// Noise handshake state.
+#[derive(Clone)]
 pub struct HandshakeState<D: DH, C: Cipher, H: Hash> {
     symmetric: SymmetricState<C, H>,
     s: Option<D::Key>,
@@ -20,28 +21,6 @@ pub struct HandshakeState<D: DH, C: Cipher, H: Hash> {
     message_index: usize,
     pattern_has_psk: bool,
     psks: ArrayVec<[[u8; 32]; 4]>,
-}
-
-impl<D, C, H> Clone for HandshakeState<D, C, H>
-where
-    D: DH,
-    C: Cipher,
-    H: Hash,
-{
-    fn clone(&self) -> Self {
-        Self {
-            symmetric: self.symmetric.clone(),
-            s: self.s.as_ref().map(U8Array::clone),
-            e: self.e.as_ref().map(U8Array::clone),
-            rs: self.rs.as_ref().map(U8Array::clone),
-            re: self.re.as_ref().map(U8Array::clone),
-            is_initiator: self.is_initiator,
-            pattern: self.pattern.clone(),
-            message_index: self.message_index,
-            pattern_has_psk: self.pattern_has_psk,
-            psks: self.psks.clone(),
-        }
-    }
 }
 
 impl<D, C, H> HandshakeState<D, C, H>
@@ -411,7 +390,7 @@ where
 
     /// Get remote static pubkey, if available.
     pub fn get_rs(&self) -> Option<D::Pubkey> {
-        self.rs.as_ref().map(U8Array::clone)
+        self.rs.as_ref().cloned()
     }
 
     /// Get remote semi-ephemeral pubkey.
@@ -420,7 +399,7 @@ where
     ///
     /// Useful for noise-pipes.
     pub fn get_re(&self) -> Option<D::Pubkey> {
-        self.re.as_ref().map(U8Array::clone)
+        self.re.as_ref().cloned()
     }
 
     /// Get whether this [`HandshakeState`] is created as initiator.

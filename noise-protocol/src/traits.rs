@@ -4,7 +4,7 @@
 
 // Use this trait so that we don't have to use [`Vec`] for some semi-fixed length buffers and
 // input/output types.
-pub trait U8Array: Sized {
+pub trait U8Array: Sized + Clone {
     /// Create a new array filled with all zeros.
     fn new() -> Self;
     /// Create a new array filled with a same value.
@@ -22,10 +22,10 @@ pub trait U8Array: Sized {
     /// As mutable slice.
     fn as_mut(&mut self) -> &mut [u8];
     // Cannot just impl [`Clone`], that will conflict with [u8; 32].
-    /// Clone.
-    fn clone(&self) -> Self {
-        Self::from_slice(self.as_slice())
-    }
+    ///// Clone.
+    //fn clone(&self) -> Self {
+    //    Self::from_slice(self.as_slice())
+    //}
 }
 
 macro_rules! impl_array {
